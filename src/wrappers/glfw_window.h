@@ -7,13 +7,13 @@
 
 class GlfwWrapper {
 public:
-    GlfwWrapper();
-    void init(int width, int height, const std::string& title);
-    void shutdown();
-    void glfw_loop();
-    ~GlfwWrapper();
+	GlfwWrapper();
+	void init(int width, int height, const std::string& title);
+	void shutdown();
+	void glfw_loop();
+	~GlfwWrapper();
 private:
-    GLFWwindow * window { nullptr };
+	GLFWwindow * window { nullptr };
 };
 
 #endif // _GLFW_WINDOW_H_
