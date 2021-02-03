@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <string>
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
@@ -26,5 +27,17 @@ enum class LL {
 	std::cout
 
 #define LOG_MSG(x) LOG_MSG_HEAD(x)
+
+#define UNUSED(a) (void)(a)
+
+#define COND_UNLIKELY(x) __builtin_expect(x, 0)
+
+#define ASSERT(x) \
+	do { \
+		if (COND_UNLIKELY(!(x))) { \
+			LOG_MSG(LL::ERROR) << "Assertion " + std::string(#x) + " failed" << '\n'; \
+			abort(); \
+		} \
+	} while (0)
 
 #endif // _LOGGER_H_
