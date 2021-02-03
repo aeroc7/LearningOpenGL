@@ -13,7 +13,8 @@ GlfwWrapper::GlfwWrapper() {
 void
 GlfwWrapper::init(int width, int height, const std::string& title) {
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	
 	window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
 
 	if (window == nullptr) {
