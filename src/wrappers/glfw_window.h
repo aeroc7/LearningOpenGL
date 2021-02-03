@@ -1,6 +1,7 @@
 #ifndef _GLFW_WINDOW_H_
 #define _GLFW_WINDOW_H_
 
+#define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 #include <string>
