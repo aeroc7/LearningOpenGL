@@ -29,8 +29,8 @@ namespace vulkan_impl {
 // Main Vulkan entry (Initialization code)
 class VulkanMain {
 public:
-    void init();
-    void fini();
+	void init();
+	void fini();
 private:
 
 };
