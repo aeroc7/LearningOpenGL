@@ -5,6 +5,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -Werror -Wall -Wextra -Wpedantic --st
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Werror -Wall -Wextra -Wpedantic --std=c99 -fPIC -g")
 
 set(SRC
+	${CMAKE_CURRENT_LIST_DIR}/vk_main.cpp
 	${CMAKE_CURRENT_LIST_DIR}/main.cpp
 )
 

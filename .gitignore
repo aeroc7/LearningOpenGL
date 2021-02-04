@@ -1,4 +1,5 @@
 .vscode
 src/build_test/build
-src/vk_triangle/build
+src/vk_main/build
+src/vk_main/main_old.cpp
 src/wrappers/build

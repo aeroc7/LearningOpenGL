@@ -11,6 +11,10 @@ public:
 	void init(int width, int height, const std::string& title);
 	void shutdown();
 	void glfw_loop();
+	
+	GLFWwindow * raw_window() {
+		return window;
+	}
 private:
 	GLFWwindow * window { nullptr };
 };
