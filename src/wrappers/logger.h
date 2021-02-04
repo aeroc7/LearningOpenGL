@@ -40,4 +40,10 @@ enum class LL {
 		} \
 	} while (0)
 
+#define QUICK_EXIT(x) \
+	do { \
+		LOG_MSG(LL::ERROR) << "Aborting program; " << x << '\n'; \
+		abort(); \
+	} while (0)
+
 #endif // _LOGGER_H_
