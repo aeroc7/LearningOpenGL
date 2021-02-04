@@ -1,3 +1,4 @@
 .vscode
 src/build_test/build
+src/vk_triangle/build
 src/wrappers/build

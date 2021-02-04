@@ -3,15 +3,13 @@
 
 #include <stdexcept>
 
-GlfwWrapper::GlfwWrapper() {
+void
+GlfwWrapper::init(int width, int height, const std::string& title) {
 	if (!glfwInit()) {
 		LOG_MSG(LL::ERROR) << "Failed to initialize glfw\n";
 		exit(EXIT_FAILURE);
 	}
-}
-
-void
-GlfwWrapper::init(int width, int height, const std::string& title) {
+	
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	
@@ -29,7 +27,6 @@ GlfwWrapper::init(int width, int height, const std::string& title) {
 void
 GlfwWrapper::glfw_loop() {
 	while(!glfwWindowShouldClose(window)) {
-		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 }
@@ -40,8 +37,6 @@ GlfwWrapper::shutdown() {
 		glfwDestroyWindow(window);
 		window = nullptr;
 	}
-}
 
-GlfwWrapper::~GlfwWrapper() {
 	glfwTerminate();
 }
