@@ -7,6 +7,15 @@
 
 namespace vulkan_impl {
 
+/*		Engine Initialization Steps:
+ * 
+ * 			1.) Create the Vulkan instance (VkInstance)
+ * 			2.) Query VkPhysicalDevice list to find a suitable device
+ * 			3.) Create VkDevice (logical device) from the physical device
+ * 			4.) Get VkQueue handles from the created VkDevice
+ * 
+ */
+
 VkResult
 CreateDebugUtilsMessengerEXT(VkInstance instance,
 	const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
@@ -55,11 +64,28 @@ VulkanMain::init() {
 
 	// Init our vulkan instance
 	vulkan_instance_init();
+	// Custom logging
 	init_debug_calls();
+	// Query device list
+	query_physical_devices();
 }
 
 void
 VulkanMain::vulkan_instance_init() {
+	// Print off supported extensions
+	uint32_t sup_exts_num = 0;
+
+	vkEnumerateInstanceExtensionProperties(nullptr, &sup_exts_num, nullptr);
+
+	std::vector<VkExtensionProperties> extension_names(sup_exts_num);
+	vkEnumerateInstanceExtensionProperties(nullptr, &sup_exts_num, extension_names.data());
+
+	LOG_MSG_NI() << "Supported Vulkan extensions: \n";
+
+	for (const auto& e : extension_names) {
+		LOG_MSG_NI() << '\t' << e.extensionName << '\n';
+	}
+
 	// Get required GLFW extensions
 	auto reqd_exts = get_required_extensions();
 
@@ -211,6 +237,87 @@ VulkanMain::init_debug_calls() {
 	if (status != VK_SUCCESS) {
 		QUICK_EXIT("Failed to set up a Vulkan debug callback");
 	}
+}
+
+void
+VulkanMain::query_physical_devices() {
+	uint32_t phys_device_count = 0;
+
+	vkEnumeratePhysicalDevices(vkm_instance, &phys_device_count, nullptr);
+
+	if (phys_device_count == 0) {
+		QUICK_EXIT("Failed to find a device with Vulkan support");
+	}
+
+	std::vector<VkPhysicalDevice> phys_device_list(phys_device_count);
+	vkEnumeratePhysicalDevices(vkm_instance, &phys_device_count, phys_device_list.data());
+
+	for (const auto& device : phys_device_list) {
+		if (verify_device(device)) {
+			vkm_physical_device = device;
+			break;
+		}
+	}
+
+	if (vkm_physical_device == VK_NULL_HANDLE) {
+		QUICK_EXIT("Failed to find a suitable device that supports Vulkan");
+	}
+}
+
+bool
+VulkanMain::verify_device(VkPhysicalDevice device) {
+	ASSERT(device != VK_NULL_HANDLE);
+
+	VkPhysicalDeviceProperties device_properties;
+	vkGetPhysicalDeviceProperties(device, &device_properties);
+
+	bool sst = (device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU ||
+		device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU ||
+		device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU);
+
+	auto qf_ret = verify_queue_families(device);
+	
+	if (!sst || !qf_ret.is_complete()) {
+		return false;
+	}
+	
+	LOG_MSG_NI() << "Vulkan Physical Device Information: \n";
+
+	auto api_version_str = retrieve_version_string(device_properties.apiVersion);
+	auto driver_version_str = retrieve_version_string(device_properties.driverVersion);
+	auto device_name_str = device_properties.deviceName;
+
+	LOG_MSG_NI() << "\tAPI Version: " << api_version_str << '\n';
+	LOG_MSG_NI() << "\tDriver Version: " << driver_version_str << '\n';
+	LOG_MSG_NI() << "\tDevice Name: " << device_name_str << '\n';
+
+	return true;
+}
+
+VulkanMain::QueueFamilyData
+VulkanMain::verify_queue_families(VkPhysicalDevice device) {
+	uint32_t queue_family_count = 0;
+	QueueFamilyData indices;
+
+	vkGetPhysicalDeviceQueueFamilyProperties(device,
+		&queue_family_count, nullptr);
+
+	std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
+	vkGetPhysicalDeviceQueueFamilyProperties(device,
+		&queue_family_count, queue_families.data());
+
+	uint32_t i = 0;
+
+	for (const auto& queue_family : queue_families) {
+		if (queue_family.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+			indices.graphics_family = i;
+			break;
+		}
+
+		++i;
+	}
+
+	return indices;
 }
 
 void

@@ -8,8 +8,23 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <optional>
 
 namespace vulkan_impl {
+
+inline std::string
+retrieve_version_string(uint32_t version) {
+	auto version_maj = VK_VERSION_MAJOR(version);
+	auto version_min = VK_VERSION_MINOR(version);
+	auto version_pat = VK_VERSION_PATCH(version);
+
+	std::string version_str =
+		std::to_string(version_maj) + '.' +
+		std::to_string(version_min) + '.' +
+		std::to_string(version_pat);
+	
+	return version_str;
+}
 
 struct VulkanMainConfig {
 	uint16_t window_width					= 1280;
@@ -53,6 +68,14 @@ public:
 	void init();
 	void fini();
 private:
+	struct QueueFamilyData {
+		std::optional<uint32_t> graphics_family;
+
+		bool is_complete() {
+			return graphics_family.has_value();
+		}
+	};
+
 	void vulkan_instance_init();
 	std::vector<const char*> get_required_extensions();
 	bool verify_validation_layer_support();
@@ -62,10 +85,15 @@ private:
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData);
 	void init_debug_calls();
+	void query_physical_devices();
+	bool verify_device(VkPhysicalDevice device);
+	QueueFamilyData verify_queue_families(VkPhysicalDevice device);
 
 	VulkanMainConfig config;
 	VkInstance vkm_instance { VK_NULL_HANDLE };
 	VkDebugUtilsMessengerEXT debug_messenger { VK_NULL_HANDLE };
+	VkPhysicalDevice vkm_physical_device { VK_NULL_HANDLE };
+	VkDevice vkm_logical_device { VK_NULL_HANDLE };
 	GlfwWrapper window;
 };
 
