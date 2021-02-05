@@ -28,6 +28,8 @@ enum class LL {
 
 #define LOG_MSG(x) LOG_MSG_HEAD(x)
 
+#define LOG_MSG_NI() std::cout
+
 #define UNUSED(a) (void)(a)
 
 #define COND_UNLIKELY(x) __builtin_expect(x, 0)
